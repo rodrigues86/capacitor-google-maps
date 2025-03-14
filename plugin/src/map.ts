@@ -96,7 +96,7 @@ class MapCustomElement extends HTMLElement {
   connectedCallback() {
     this.innerHTML = '';
 
-    if (Capacitor.getPlatform() == 'ios') {
+    if (Capacitor.getPlatform() == 'ios' || Capacitor.getPlatform() == 'android') {
       this.style.overflow = 'scroll';
       (this.style as any)['-webkit-overflow-scrolling'] = 'touch';
 
@@ -149,37 +149,32 @@ export class GoogleMap {
     try {
       const newMap = new GoogleMap(options.id);
 
-      alert('1');
-  
       if (!options.element) {
+        alert('container element is required');
         throw new Error('container element is required');
       }
-  
+
       if (options.config.androidLiteMode === undefined) {
         options.config.androidLiteMode = false;
       }
-  
-      alert('2');
-  
+
       newMap.element = options.element;
       newMap.element.dataset.internalId = options.id;
-  
+
       const elementBounds = await GoogleMap.getElementBounds(options.element);
       options.config.width = elementBounds.width;
       options.config.height = elementBounds.height;
       options.config.x = elementBounds.x;
       options.config.y = elementBounds.y;
       options.config.devicePixelRatio = window.devicePixelRatio;
-  
+
       if (Capacitor.getPlatform() == 'android') {
         newMap.initScrolling();
       }
 
-      alert('3');
-  
       if (Capacitor.isNativePlatform()) {
-        (options.element as unknown) = {};
-  
+        (options.element as any) = {};
+
         const getMapBounds = () => {
           const mapRect = newMap.element?.getBoundingClientRect() ?? ({} as DOMRect);
           return {
@@ -190,8 +185,6 @@ export class GoogleMap {
           };
         };
 
-        alert('4');
-  
         const onDisplay = () => {
           CapacitorGoogleMaps.onDisplay({
             id: newMap.id,
@@ -199,8 +192,6 @@ export class GoogleMap {
           });
         };
 
-        alert('5');
-  
         const onResize = () => {
           CapacitorGoogleMaps.onResize({
             id: newMap.id,
@@ -208,8 +199,6 @@ export class GoogleMap {
           });
         };
 
-        alert('6');
-  
         const ionicPage = newMap.element.closest('.ion-page');
         if (Capacitor.getPlatform() === 'ios' && ionicPage) {
           ionicPage.addEventListener('ionViewWillEnter', () => {
@@ -224,38 +213,34 @@ export class GoogleMap {
           });
         }
 
-        alert('7');
-  
         const lastState = {
           width: elementBounds.width,
           height: elementBounds.height,
           isHidden: false,
         };
         newMap.resizeObserver = new ResizeObserver(() => {
-          if (newMap.element != null) {
-            const mapRect = newMap.element.getBoundingClientRect();
-  
-            const isHidden = mapRect.width === 0 && mapRect.height === 0;
+          if (newMap.element instanceof Node) {
+            const { width, height } = newMap.element.getBoundingClientRect();
+
+            const isHidden = width === 0 && height === 0;
             if (!isHidden) {
               if (lastState.isHidden) {
                 if (Capacitor.getPlatform() === 'ios' && !ionicPage) {
                   onDisplay();
                 }
-              } else if (lastState.width !== mapRect.width || lastState.height !== mapRect.height) {
+              } else if (lastState.width !== width || lastState.height !== height) {
                 onResize();
               }
             }
-  
-            lastState.width = mapRect.width;
-            lastState.height = mapRect.height;
+
+            lastState.width = width;
+            lastState.height = height;
             lastState.isHidden = isHidden;
           }
         });
-        newMap.resizeObserver.observe(newMap.element);
+        // newMap.resizeObserver.observe(newMap.element as Element);
       }
 
-      alert('8');
-  
       // small delay to allow for iOS WKWebView to setup corresponding element sub-scroll views ???
       await new Promise((resolve, reject) => {
         setTimeout(async () => {
@@ -266,9 +251,9 @@ export class GoogleMap {
             alert('CapacitorGoogleMaps.create() error!');
             reject(err);
           }
-        }, 200);
+        }, 600);
       });
-  
+
       if (callback) {
         const onMapReadyListener = await CapacitorGoogleMaps.addListener('onMapReady', (data: MapReadyCallbackData) => {
           if (data.mapId == newMap.id) {
@@ -277,9 +262,8 @@ export class GoogleMap {
           }
         });
       }
-  
-      return newMap;
 
+      return newMap;
     } catch (error) {
       alert(`Error creating map ${error}`);
       console.error('Error creating map:', error);

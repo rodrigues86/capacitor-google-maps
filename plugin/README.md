@@ -1,11 +1,11 @@
-# @capacitor/google-maps
+# @rodrigues86/capacitor-google-maps
 
 Google maps on Capacitor
 
 ## Install
 
 ```bash
-npm install @capacitor/google-maps
+npm install @rodrigues86/capacitor-google-maps
 npx cap sync
 ```
 
@@ -115,7 +115,7 @@ capacitor-google-map {
 Next, we should create the map reference. This is done by importing the GoogleMap class from the Capacitor plugin and calling the create method, and passing in the required parameters.
 
 ```typescript
-import { GoogleMap } from '@capacitor/google-maps';
+import { GoogleMap } from '@rodrigues86/capacitor-google-maps';
 
 const apiKey = 'YOUR_API_KEY_HERE';
 
@@ -172,7 +172,7 @@ await newMap.destroy();
 ### Angular
 
 ```typescript
-import { GoogleMap } from '@capacitor/google-maps';
+import { GoogleMap } from '@rodrigues86/capacitor-google-maps';
 
 @Component({
   template: `
@@ -214,7 +214,7 @@ export class MyMap {
 ### React
 
 ```jsx
-import { GoogleMap } from '@capacitor/google-maps';
+import { GoogleMap } from '@rodrigues86/capacitor-google-maps';
 import { useRef } from 'react';
 
 const MyMap: React.FC = () => {
@@ -269,7 +269,7 @@ export default MyMap;
 </style>
 
 <script>
-  import { GoogleMap } from '@capacitor/google-maps';
+  import { GoogleMap } from '@rodrigues86/capacitor-google-maps';
 
   const createMap = async () => {
     const mapRef = document.getElementById('map');

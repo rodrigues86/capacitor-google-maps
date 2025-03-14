@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GoogleMap, LatLngBounds } from '@capacitor/google-maps';
+import { GoogleMap, LatLngBounds } from '@rodrigues86/capacitor-google-maps';
 import {
   IonButton,
   IonCol,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GoogleMap, Marker } from '@capacitor/google-maps';
+import { GoogleMap, Marker } from '@rodrigues86/capacitor-google-maps';
 import { IonButton, IonTextarea } from '@ionic/react';
 import BaseTestingPage from '../../components/BaseTestingPage';
 
