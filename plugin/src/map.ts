@@ -96,7 +96,7 @@ class MapCustomElement extends HTMLElement {
   connectedCallback() {
     this.innerHTML = '';
 
-    if (Capacitor.getPlatform() == 'ios' || Capacitor.getPlatform() == 'android') {
+    if (Capacitor.getPlatform() == 'ios') {
       this.style.overflow = 'scroll';
       (this.style as any)['-webkit-overflow-scrolling'] = 'touch';
 
@@ -173,8 +173,6 @@ export class GoogleMap {
       }
 
       if (Capacitor.isNativePlatform()) {
-        (options.element as any) = {};
-
         const getMapBounds = () => {
           const mapRect = newMap.element?.getBoundingClientRect() ?? ({} as DOMRect);
           return {
@@ -238,21 +236,15 @@ export class GoogleMap {
             lastState.isHidden = isHidden;
           }
         });
-        // newMap.resizeObserver.observe(newMap.element as Element);
+        newMap.resizeObserver.observe(newMap.element);
       }
 
       // small delay to allow for iOS WKWebView to setup corresponding element sub-scroll views ???
-      await new Promise((resolve, reject) => {
-        setTimeout(async () => {
-          try {
-            await CapacitorGoogleMaps.create(options);
-            resolve(undefined);
-          } catch (err) {
-            alert('CapacitorGoogleMaps.create() error!');
-            reject(err);
-          }
-        }, 600);
-      });
+      try {
+        await CapacitorGoogleMaps.create(options);
+      } catch (err) {
+        alert('CapacitorGoogleMaps.create() error!');
+      }
 
       if (callback) {
         const onMapReadyListener = await CapacitorGoogleMaps.addListener('onMapReady', (data: MapReadyCallbackData) => {
@@ -268,6 +260,28 @@ export class GoogleMap {
       alert(`Error creating map ${error}`);
       console.error('Error creating map:', error);
       throw error;
+    }
+  }
+
+  initScrolling(): void {
+    const ionContents = document.getElementsByTagName('ion-content');
+
+    // eslint-disable-next-line @typescript-eslint/prefer-for-of
+    for (let i = 0; i < ionContents.length; i++) {
+      (ionContents[i] as any).scrollEvents = true;
+    }
+
+    window.addEventListener('ionScroll', this.handleScrollEvent);
+    window.addEventListener('scroll', this.handleScrollEvent);
+    window.addEventListener('resize', this.handleScrollEvent);
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', () => {
+        setTimeout(this.updateMapBounds, 500);
+      });
+    } else {
+      window.addEventListener('orientationchange', () => {
+        setTimeout(this.updateMapBounds, 500);
+      });
     }
   }
 
@@ -582,29 +596,6 @@ export class GoogleMap {
       bounds,
       padding,
     });
-  }
-
-  initScrolling(): void {
-    const ionContents = document.getElementsByTagName('ion-content');
-
-    // eslint-disable-next-line @typescript-eslint/prefer-for-of
-    for (let i = 0; i < ionContents.length; i++) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (ionContents[i] as any).scrollEvents = true;
-    }
-
-    window.addEventListener('ionScroll', this.handleScrollEvent);
-    window.addEventListener('scroll', this.handleScrollEvent);
-    window.addEventListener('resize', this.handleScrollEvent);
-    if (screen.orientation) {
-      screen.orientation.addEventListener('change', () => {
-        setTimeout(this.updateMapBounds, 500);
-      });
-    } else {
-      window.addEventListener('orientationchange', () => {
-        setTimeout(this.updateMapBounds, 500);
-      });
-    }
   }
 
   disableScrolling(): void {

@@ -1,8 +1,8 @@
 {
   "name": "@rodrigues86/capacitor-google-maps",
-  "version": "7.0.18",
+  "version": "1.0.0",
   "description": "Google maps on Capacitor",
-  "main": "dist/plugin.cjs.js",
+  "main": "dist/esm/index.js",
   "module": "dist/esm/index.js",
   "typings": "dist/typings/index.d.ts",
   "typesVersions": {
@@ -24,7 +24,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ionic-team/capacitor-google-maps.git"
+    "url": "git+https://github.com/rodrigues86/capacitor-google-maps.git"
   },
   "bugs": {
     "url": "https://github.com/ionic-team/capacitor-google-maps/issues"
@@ -54,10 +54,10 @@
     "unittest:android": "cd ./unit-tests/android && ./gradlew testDebugUnitTest"
   },
   "devDependencies": {
-    "@capacitor/android": "7.0.1",
-    "@capacitor/core": "7.0.1",
+    "@capacitor/android": "next",
+    "@capacitor/core": "next",
     "@capacitor/docgen": "0.3.0",
-    "@capacitor/ios": "7.0.0",
+    "@capacitor/ios": "next",
     "@ionic/prettier-config": "^1.0.1",
     "@types/resize-observer-browser": "^0.1.7",
     "@types/supercluster": "^7.1.0",
