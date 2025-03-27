@@ -146,11 +146,9 @@ export class GoogleMap {
     options: CreateMapArgs,
     callback?: MapListenerCallback<MapReadyCallbackData>
   ): Promise<GoogleMap> {
+    const newMap = new GoogleMap(options.id);
     try {
-      const newMap = new GoogleMap(options.id);
-
       if (!options.element) {
-        alert('container element is required');
         throw new Error('container element is required');
       }
 
@@ -217,7 +215,7 @@ export class GoogleMap {
           isHidden: false,
         };
         newMap.resizeObserver = new ResizeObserver(() => {
-          if (newMap.element instanceof Node) {
+          if (newMap.element != null) {
             const { width, height } = newMap.element.getBoundingClientRect();
 
             const isHidden = width === 0 && height === 0;
@@ -229,6 +227,7 @@ export class GoogleMap {
               } else if (lastState.width !== width || lastState.height !== height) {
                 onResize();
               }
+              onResize();
             }
 
             lastState.width = width;
@@ -240,11 +239,17 @@ export class GoogleMap {
       }
 
       // small delay to allow for iOS WKWebView to setup corresponding element sub-scroll views ???
-      try {
-        await CapacitorGoogleMaps.create(options);
-      } catch (err) {
-        alert('CapacitorGoogleMaps.create() error!');
-      }
+      await new Promise((resolve, reject) => {
+        setTimeout(async () => {
+          try {
+            await CapacitorGoogleMaps.create(options);
+            resolve(undefined);
+          } catch (err) {
+            alert(`Error creating CapacitorGoogleMaps: ${err}`);
+            reject(err);
+          }
+        }, 400);
+      });
 
       if (callback) {
         const onMapReadyListener = await CapacitorGoogleMaps.addListener('onMapReady', (data: MapReadyCallbackData) => {
@@ -254,35 +259,11 @@ export class GoogleMap {
           }
         });
       }
-
-      return newMap;
     } catch (error) {
-      alert(`Error creating map ${error}`);
-      console.error('Error creating map:', error);
-      throw error;
-    }
-  }
-
-  initScrolling(): void {
-    const ionContents = document.getElementsByTagName('ion-content');
-
-    // eslint-disable-next-line @typescript-eslint/prefer-for-of
-    for (let i = 0; i < ionContents.length; i++) {
-      (ionContents[i] as any).scrollEvents = true;
+      alert('Error creating map: ' + error);
     }
 
-    window.addEventListener('ionScroll', this.handleScrollEvent);
-    window.addEventListener('scroll', this.handleScrollEvent);
-    window.addEventListener('resize', this.handleScrollEvent);
-    if (screen.orientation) {
-      screen.orientation.addEventListener('change', () => {
-        setTimeout(this.updateMapBounds, 500);
-      });
-    } else {
-      window.addEventListener('orientationchange', () => {
-        setTimeout(this.updateMapBounds, 500);
-      });
-    }
+    return newMap;
   }
 
   private static async getElementBounds(element: HTMLElement): Promise<DOMRect> {
@@ -596,6 +577,28 @@ export class GoogleMap {
       bounds,
       padding,
     });
+  }
+
+  initScrolling(): void {
+    const ionContents = document.getElementsByTagName('ion-content');
+
+    // eslint-disable-next-line @typescript-eslint/prefer-for-of
+    for (let i = 0; i < ionContents.length; i++) {
+      (ionContents[i] as any).scrollEvents = true;
+    }
+
+    window.addEventListener('ionScroll', this.handleScrollEvent);
+    window.addEventListener('scroll', this.handleScrollEvent);
+    window.addEventListener('resize', this.handleScrollEvent);
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', () => {
+        setTimeout(this.updateMapBounds, 500);
+      });
+    } else {
+      window.addEventListener('orientationchange', () => {
+        setTimeout(this.updateMapBounds, 500);
+      });
+    }
   }
 
   disableScrolling(): void {
