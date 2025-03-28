@@ -1,6 +1,6 @@
 {
   "name": "@rodrigues86/capacitor-google-maps",
-  "version": "7.0.86",
+  "version": "7.0.88",
   "main": "plugin/dist/esm/index.js",
   "types": "plugin/dist/typings/index.d.ts",
   "scripts": {

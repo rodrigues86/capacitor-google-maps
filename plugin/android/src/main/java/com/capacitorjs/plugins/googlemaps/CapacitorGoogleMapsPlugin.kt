@@ -888,7 +888,7 @@ class CapacitorGoogleMapsPlugin : Plugin(), OnMapsSdkInitializedCallback {
                     } else {
                         this.bridge.webView.onTouchEvent(event)
                     }
-                    events.removeAt(0)
+                    events.removeFirst()
                 }
             }
 

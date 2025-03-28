@@ -248,7 +248,7 @@ export class GoogleMap {
             alert(`Error creating CapacitorGoogleMaps: ${err}`);
             reject(err);
           }
-        }, 400);
+        }, 200);
       });
 
       if (callback) {

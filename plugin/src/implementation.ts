@@ -213,8 +213,6 @@ CapacitorGoogleMaps.addListener('isMapInFocus', (data) => {
   const x = data.x;
   const y = data.y;
 
-  console.log('isMapInFocus');
-
   const elem = document.elementFromPoint(x, y) as HTMLElement | null;
   const internalId = elem?.dataset?.internalId;
   const mapInFocus = internalId === data.mapId;
