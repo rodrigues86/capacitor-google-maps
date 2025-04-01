@@ -227,7 +227,7 @@ const MyMap: React.FC = () => {
     newMap = await GoogleMap.create({
       id: 'my-cool-map',
       element: mapRef.current,
-      apiKey: process.env.REACT_APP_YOUR_API_KEY_HERE,
+      apiKey: process.env.REACT_APP_YOUR_API_KEY_HERE, // It's the WEB Api Key in Android
       config: {
         center: {
           lat: 33.6,
@@ -277,7 +277,7 @@ export default MyMap;
     const newMap = await GoogleMap.create({
       id: 'my-map', // Unique identifier for this map instance
       element: mapRef, // reference to the capacitor-google-map element
-      apiKey: 'YOUR_API_KEY_HERE', // Your Google Maps API Key
+      apiKey: 'YOUR_API_KEY_HERE', // Your Google Maps WEB API Key in Android
       config: {
         center: {
           // The initial position to be rendered by the map

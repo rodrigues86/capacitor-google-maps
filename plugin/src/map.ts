@@ -227,7 +227,6 @@ export class GoogleMap {
               } else if (lastState.width !== width || lastState.height !== height) {
                 onResize();
               }
-              onResize();
             }
 
             lastState.width = width;

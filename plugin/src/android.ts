@@ -29,6 +29,7 @@ import type {
   AddPolylinesArgs,
   RemovePolylinesArgs,
   IndoorMapArgs,
+  MapBoundsArgs,
 } from './implementation';
 
 export class CapacitorGoogleMapsAndroid extends WebPlugin implements CapacitorGoogleMapsPlugin {
@@ -233,38 +234,34 @@ export class CapacitorGoogleMapsAndroid extends WebPlugin implements CapacitorGo
   }
 
   async enableAccessibilityElements(): Promise<void> {
-    throw new Error('Method not supported on web.');
+    throw new Error('Method not supported on android.');
   }
 
   dispatchMapEvent(): Promise<void> {
-    throw new Error('Method not supported on web.');
+    throw new Error('Method not supported on android.');
   }
 
   async enableCurrentLocation(_args: CurrentLocArgs): Promise<void> {
     if (_args.enabled) {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position: GeolocationPosition) => {
-            const pos = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
+        navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
 
-            this.maps[_args.id].map.setCenter(pos);
+          this.maps[_args.id].map.setCenter(pos);
 
-            this.notifyListeners('onMyLocationButtonClick', {});
+          this.notifyListeners('onMyLocationButtonClick', {});
 
-            this.notifyListeners('onMyLocationClick', {});
-          },
-          () => {
-            throw new Error('Geolocation not supported on web browser.');
-          }
-        );
+          this.notifyListeners('onMyLocationClick', {});
+        });
       } else {
-        throw new Error('Geolocation not supported on web browser.');
+        throw new Error('Geolocation not supported on android.');
       }
     }
   }
+
   async setPadding(_args: PaddingArgs): Promise<void> {
     const bounds = this.maps[_args.id].map.getBounds();
 
@@ -471,16 +468,57 @@ export class CapacitorGoogleMapsAndroid extends WebPlugin implements CapacitorGo
     }
   }
 
-  async onScroll(): Promise<void> {
-    throw new Error('Method not supported on web.');
+  async onScroll(_args: MapBoundsArgs): Promise<void> {
+    try {
+      const mapInstance = this.maps[_args.id]?.map;
+      if (!mapInstance) {
+        console.error(`Map with ID ${_args.id} not found.`);
+        return;
+      }
+
+      const { x, y, width, height } = _args.mapBounds;
+
+      const bounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(y, x),
+        new google.maps.LatLng(y + height, x + width)
+      );
+
+      mapInstance.fitBounds(bounds);
+    } catch (error) {
+      console.error('Error updating map bounds:', error);
+    }
   }
 
-  async onResize(): Promise<void> {
-    throw new Error('Method not supported on web.');
+  async onResize(_args: MapBoundsArgs): Promise<void> {
+    try {
+      const mapInstance = this.maps[_args.id]?.map;
+      if (!mapInstance) {
+        console.error(`Map with ID ${_args.id} not found.`);
+        return;
+      }
+
+      google.maps.event.trigger(mapInstance, 'resize');
+
+      this.onScroll(_args);
+    } catch (error) {
+      console.error('Error resizing map:', error);
+    }
   }
 
-  async onDisplay(): Promise<void> {
-    throw new Error('Method not supported on web.');
+  async onDisplay(_args: MapBoundsArgs): Promise<void> {
+    try {
+      const mapInstance = this.maps[_args.id]?.map;
+      if (!mapInstance) {
+        console.error(`Map with ID ${_args.id} not found.`);
+        return;
+      }
+
+      google.maps.event.trigger(mapInstance, 'resize');
+
+      this.onScroll(_args);
+    } catch (error) {
+      console.error('Error displaying map:', error);
+    }
   }
 
   async create(_args: CreateMapArgs): Promise<void> {
